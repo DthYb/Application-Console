@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using static SPA.Animal;
-using static SPA.Chenil;
-using static SPA.Soigneur;
+using static SPA.AnimalBll;
+using static SPA.ChenilBll;
+using static SPA.SoigneurBll;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SPA
@@ -18,11 +18,13 @@ namespace SPA
             bool menu = true;
             while (menu == true)
             {
+                Console.Clear();
                 Console.WriteLine("Menu :");
                 Console.WriteLine("1: Gestion Animal");
                 Console.WriteLine("2: Gestion Chenil");
                 Console.WriteLine("3: Gestion Soigneur ");
-                Console.WriteLine("4: Quitter l'application");
+                Console.WriteLine("0: Quitter l'application");
+                Console.WriteLine();
                 switch (GetIntFromConsole())
                 {
                     case 1:
@@ -35,8 +37,9 @@ namespace SPA
                         break; 
                     case 3:
                         Console.Clear();
+                        MainSoigneurFonction();
                         break; 
-                    case 4:
+                    case 0:
                         Console.Clear();
                         Console.WriteLine("Voulez-vous vraiment sortir de l'application ?");
                         string sortie = Console.ReadLine();

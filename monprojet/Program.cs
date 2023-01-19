@@ -8,7 +8,7 @@ namespace monprojet
         static void Main(string[] args)
         {
             Voiture Voiture1 = new Voiture()
-            {
+            {                
                 Modele = "Clio",
                 Couleur = "Noire",
                 Marque = "Renault",
@@ -16,9 +16,11 @@ namespace monprojet
                 Moteur = Voiture.Motorisation.Thermique,
                 DateConstruction= DateTime.Now,
                 Immatriculation = "PL-123-AK",
-                EstAssure = true,
-
+                EstAssure = true
             };
+
+
+
             string value = null;
             if (Voiture1.EstAssure == true)
             {
