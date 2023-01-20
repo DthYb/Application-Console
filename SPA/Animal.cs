@@ -16,11 +16,6 @@ namespace SPA
         public int Age { get; set; }
         public int Poids { get; set; }
         public bool EstSterilise { get; set; }
-        public enum TypeEspece
-        {
-            chien,
-            chat
-        }
 
         public enum TySexe
         {

@@ -8,9 +8,13 @@ using static SPA.Animal;
 
 namespace SPA
 {
-    public class AnimalBll
+    internal class AnimalBll
     {
-        static List<Animal> AnimauxList = new List<Animal>();
+        public static List<Animal> AnimauxList = new List<Animal>()
+        {
+            new Animal(0, "Rex", TypeEspece.Chien, 35, 0, 8, 6, true),
+            new Animal(1, "ralph", TypeEspece.Chien, 25, 0, 6, 3, true)
+        };
         public static void MainAnimalFonction()
         {
             //Animal animal1 = new Animal(0, "Rex", Animal.TypeEspece.chien, 35, 0, 8, 6, true);
@@ -207,7 +211,7 @@ namespace SPA
                 }
             }
 
-            Animal.TypeEspece montype = Animal.TypeEspece.chien;
+            TypeEspece montype = TypeEspece.Chien;
             bool esp = false;
             while (esp == false)
             {
@@ -219,11 +223,11 @@ namespace SPA
                     switch (especeRep.ToLower())
                     {
                         case "1":
-                            montype = Animal.TypeEspece.chien;
+                            montype = TypeEspece.Chien;
                             esp = true;
                             break;
                         case "2":
-                            montype = Animal.TypeEspece.chat;
+                            montype = TypeEspece.Chat;
                             esp = true;
                             break;
                         default:

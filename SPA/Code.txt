@@ -1,0 +1,97 @@
+﻿                foreach (Chenil ch in ChenilList)
+                {
+                    Console.Write("Liste d'Id des animaux : ");
+                    foreach (int i in ch.IdListani)
+                    {
+                        Console.WriteLine(i + ", ");
+                    }
+                    Console.WriteLine("Lequel voulez-vous retirer de ce chenil ?");
+                    tmpani = GetIntFromConsole();
+                    foreach (Animal animaux in AnimauxList)
+                    {
+                        if (animaux.Id == tmpani)
+                        {
+                            animalmodif = animaux;
+                            ch.IdListSoigneur.Remove(tmpani);
+                            Console.WriteLine("Succès");
+                            Console.WriteLine();
+                            break;
+                        }
+                        loop = true;
+                        if (animalmodif == null)
+                        {
+                            Console.WriteLine("L'id ne correspond à aucun animal dans la liste");
+                        }
+                        else
+                        {
+                            loop = false;
+                        }
+                    }
+                }
+
+
+
+            if (SoigneurList.Count == 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Impossible d'accéder à ce menu, il n'y a aucun soigneur dans la liste.");
+                Console.WriteLine();
+                return;
+            }
+            Console.WriteLine("Appuyez sur échap pour annuler ou autre pour continuer.");
+            if (Console.ReadKey(true).Key == ConsoleKey.Escape)
+            {
+                return;
+            }
+            Soigneur soigneurmodif = null;
+            int deletesoigneur = -1;
+            string tmplib = null;
+            bool loop = true;
+            while (loop == true)
+            {
+                foreach (Chenil ch in ChenilList)
+                {
+                    Console.WriteLine(ch.Libelle + " " + ch.Enclos + " " + ch.Capacite + " " + ch.IdListani.Count + " " + ch.IdListSoigneur.Count);
+                }
+                Console.WriteLine("Quel chenil voulez-vous modifier ?");
+                tmplib = Console.ReadLine();
+                Chenil chenilselect = ChenilList.Where(ch => ch.Libelle.ToLower() == tmplib.ToLower()).FirstOrDefault();
+                if (chenilselect != null)
+                {
+                    Console.Write("Liste d'Id des soigneurs : ");
+                    foreach (int i in chenilselect.IdListSoigneur)
+                    {
+                        Console.WriteLine(i + ", ");
+                    }
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Chenil introuvable !");
+                    continue;
+                }
+
+                Console.WriteLine("Choisissez le soigneur a retirer du chenil");
+                deletesoigneur = GetIntFromConsole();
+                foreach (Soigneur soigneur in SoigneurList)
+                {
+                    if (soigneur.Id == deletesoigneur)
+                    {
+                        soigneurmodif = soigneur;
+                        chenilselect.IdListSoigneur.Remove(deletesoigneur);
+                        Console.WriteLine("Succès");
+                        Console.WriteLine();
+                        break;
+                    }
+                }
+                loop = true;
+                if (soigneurmodif == null)
+                {
+                    Console.WriteLine("L'id ne correspond à aucun soigneur dans la liste");
+                }
+                else
+                {
+                    loop = false;
+                }
+            }
+        }

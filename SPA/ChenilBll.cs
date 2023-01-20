@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using static SPA.Chenil;
 using static SPA.Program;
 using static SPA.SoigneurBll;
+using static SPA.AnimalBll;
+using System.Net.Mail;
 
 namespace SPA
 {
@@ -14,8 +16,8 @@ namespace SPA
     {
         static List<Chenil> ChenilList = new List<Chenil>()
         {
-            new Chenil("ch0", TypeChenil.Chien, 30),
-            new Chenil("ch1", TypeChenil.Chat, 20)
+            new Chenil("ch0", TypeEspece.Chien, 30),
+            new Chenil("ch1", TypeEspece.Chat, 20)
         };
         public static void MainChenilFonction()
         {
@@ -115,11 +117,11 @@ namespace SPA
                         {
                             case 1:
                                 Console.Clear();
-
+                                AddAnimalToList();
                                 break;
                             case 2:
                                 Console.Clear();
-
+                                RemoveAnimalFromList();
                                 break;
                             case 3:
                                 Console.Clear();
@@ -186,7 +188,7 @@ namespace SPA
                 }
             }
             annul = false;
-            Chenil.TypeChenil typechenil = Chenil.TypeChenil.Chien;
+            TypeEspece typechenil = TypeEspece.Chien;
             while (annul == false)
             {
                 Console.WriteLine("Indiquer le Type d'animal du Chenil | 1 pour chien & 2 pour chat");
@@ -197,11 +199,11 @@ namespace SPA
                     switch (typetmp.ToLower())
                     {
                         case "1":
-                            typechenil = Chenil.TypeChenil.Chien;
+                            typechenil = TypeEspece.Chien;
                             annul = true;
                             break;
                         case "2":
-                            typechenil = Chenil.TypeChenil.Chat;
+                            typechenil = TypeEspece.Chat;
                             annul = true;
                             break;
                         default:
@@ -283,6 +285,7 @@ namespace SPA
                         Console.Clear();
                         Console.WriteLine("D'accord");
                         Console.WriteLine();
+                        annul = true;
                         break;
                     default:
                         Console.WriteLine("Je n'ai pas compris");
@@ -320,13 +323,13 @@ namespace SPA
                     }
                 }
             }
-            Console.WriteLine();
-            Console.WriteLine("Confirmer le soigneur à ajouter ?");
             Soigneur soigneurmodif = null;
             int deletenumber = -1;
             loop = true;
             while (loop == true)
             {
+                Console.WriteLine();
+                Console.WriteLine("Confirmer le soigneur à ajouter ?");
                 deletenumber = GetIntFromConsole();
                 foreach (Soigneur soigneur in SoigneurList)
                 {
@@ -334,33 +337,41 @@ namespace SPA
                     {
                         soigneurmodif = soigneur;
                         string libtmp = null;
-                        while (libtmp == null || libtmp == "" || libtmp == " ") {
-                        Console.Clear();
-                        Console.WriteLine("A quel chenil voulez-vous l'assigner ? :");
-                        foreach (Chenil ch in ChenilList)
+                        while (libtmp == null || libtmp == "" || libtmp == " ")
                         {
-                            Console.WriteLine(ch.Libelle + " " + ch.Enclos + " " + ch.Capacite + " " + ch.IdListani.Count + " " + ch.IdListSoigneur.Count);
-                        }
-                        Console.WriteLine();
-                        libtmp = Console.ReadLine();
-                        }
-                        foreach (Chenil ch in ChenilList)
-                        {
-                            if (libtmp == ch.Libelle)
+                            Console.Clear();
+                            Console.WriteLine("A quel chenil voulez-vous l'assigner ? :");
+                            foreach (Chenil ch in ChenilList)
                             {
-                                bool Estajoute = ch.IdListSoigneur.Add(deletenumber);
+                                Console.WriteLine(ch.Libelle + " " + ch.Enclos + " " + ch.Capacite + " " + ch.IdListani.Count + " " + ch.IdListSoigneur.Count);
+                            }
+                            Console.WriteLine();
+                            libtmp = Console.ReadLine();
+                        }
+                        bool Estajoute = false;
+                        foreach (Chenil ch in ChenilList)
+                        {
+
+                            if (libtmp.ToLower() == ch.Libelle.ToLower())
+                            {
+                                Estajoute = ch.IdListSoigneur.Add(deletenumber);
                                 if (Estajoute)
                                 {
                                     Console.WriteLine("Succès");
+                                    loop = false;
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Soigneur déjà assigné a ce genil");
+                                    Console.WriteLine("Soigneur déjà assigné a ce chenil");
+                                    loop = false;
                                 }
                                 Console.WriteLine();
                             }
                         }
-                        loop = false;
+                        if (Estajoute == false)
+                        {
+                            Console.WriteLine("Chenil Introuvable");
+                        }
                         break;
                     }
                 }
@@ -385,6 +396,8 @@ namespace SPA
             {
                 return;
             }
+            Soigneur soigneurmodif = null;
+            int deletesoigneur = -1;
             string tmplib = null;
             bool loop = true;
             while (loop == true)
@@ -395,17 +408,258 @@ namespace SPA
                 }
                 Console.WriteLine("Quel chenil voulez-vous modifier ?");
                 tmplib = Console.ReadLine();
+                Chenil chenilselect = ChenilList.Where(ch => ch.Libelle.ToLower() == tmplib.ToLower()).FirstOrDefault();
+                if (chenilselect != null)
+                {
+                    Console.Write("Liste d'Id des soigneurs : ");
+                    foreach (int i in chenilselect.IdListSoigneur)
+                    {
+                        Console.WriteLine(i + ", ");
+                    }
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Chenil introuvable !");
+                    continue;
+                }
+
+                Console.WriteLine("Choisissez le soigneur a retirer du chenil");
+                deletesoigneur = GetIntFromConsole();
+                foreach (Soigneur soigneur in SoigneurList)
+                {
+                    if (soigneur.Id == deletesoigneur)
+                    {
+                        soigneurmodif = soigneur;
+                        chenilselect.IdListSoigneur.Remove(deletesoigneur);
+                        Console.WriteLine("Succès");
+                        Console.WriteLine();
+                        break;
+                    }
+                }
+                loop = true;
+                if (soigneurmodif == null)
+                {
+                    Console.WriteLine("L'id ne correspond à aucun soigneur dans la liste");
+                }
+                else
+                {
+                    loop = false;
+                }
+            }
+        }
+        static void AddAnimalToList()
+        {
+            if (AnimauxList.Count == 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Impossible d'accéder à ce menu, il n'y a aucun animal dans la liste.");
+                Console.WriteLine();
+                return;
+            }
+            Console.WriteLine("Appuyez sur échap pour annuler ou autre pour continuer.");
+            if (Console.ReadKey(true).Key == ConsoleKey.Escape)
+            {
+                return;
+            }
+            Animal animaltmp = null;
+            int addnumber = -1;
+            string tmplib = null;
+            bool loop = true;
+            while (loop == true)
+            {
+                Console.Clear();
+                Console.WriteLine("Rechercher l'animal à ajouter: ");
+                tmplib = Console.ReadLine();
+
+                foreach (Animal animaux in AnimauxList)
+                {
+                    if (animaux.Nom.ToLower() == tmplib.ToLower())
+                    {
+                        //string messageSterilisation = "";
+
+                        //if (animaux.EstSterilise)
+                        //{
+                        //    messageSterilisation = "Stérilisé";
+                        //}
+                        //else
+                        //{
+                        //    messageSterilisation = "non - Stérilisé";
+                        //}
+
+                        //Console.WriteLine(animaux.Id + " " + animaux.Nom + " " + animaux.Taille + " " + animaux.Espece + " " + animaux.Sexe + " " + animaux.Age + " " + animaux.Poids + " " + messageSterilisation);
+                        //Console.WriteLine();
+                        loop = false;
+                    }
+                }
+
+            }
+            Console.Clear();
+            TypeEspece montype = TypeEspece.Chien;
+            loop = true;
+            while (loop == true)
+            {
+                foreach (Animal animaux in AnimauxList)
+                {
+                    if (animaux.Nom.ToLower() == tmplib.ToLower())
+                    {
+                        string messageSterilisation = "";
+
+                        if (animaux.EstSterilise)
+                        {
+                            messageSterilisation = "Stérilisé";
+                        }
+                        else
+                        {
+                            messageSterilisation = "non - Stérilisé";
+                        }
+
+                        Console.WriteLine(animaux.Id + " " + animaux.Nom + " " + animaux.Taille + " " + animaux.Espece + " " + animaux.Sexe + " " + animaux.Age + " " + animaux.Poids + " " + messageSterilisation);
+                        Console.WriteLine();
+                        montype = animaux.Espece;
+                    }
+                }
+                Console.WriteLine("Quel animal voulez-vous ajouter ? (Indiquer son ID)");
+                addnumber = GetIntFromConsole();
+                foreach (Animal animaux in AnimauxList)
+                {
+                    if (animaux.Id == addnumber)
+                    {
+                        animaltmp = animaux;
+                        loop = false;
+                    }
+                }
+            }
+            string cheniltmp = null;
+            loop = true;
+            while (loop == true)
+            {
+                Console.WriteLine("A quel chenil voulez-vous l'ajouter ? :");
                 foreach (Chenil ch in ChenilList)
                 {
-                    foreach (var listsoi in ch.IdListSoigneur)
+                    Console.WriteLine(ch.Libelle + " " + ch.Enclos + " " + ch.Capacite + " " + ch.IdListani.Count + " " + ch.IdListSoigneur.Count);
+                }
+                Console.WriteLine();
+                cheniltmp = Console.ReadLine();
+                bool Estajoute = false;
+                foreach (Chenil ch in ChenilList)
+                {
+                    if (montype == ch.Enclos)
                     {
+                        if (cheniltmp.ToLower() == ch.Libelle.ToLower())
                         {
-                            if (tmplib.ToLower() == ch.Libelle.ToLower())
+                            Estajoute = ch.IdListani.Add(addnumber);
+                            if (Estajoute)
                             {
-                                Console.WriteLine("Liste d'Id des soigneurs :" + listsoi);
+                                Console.WriteLine();
+                                Console.WriteLine("Succès");
+                                loop = false;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Animal déjà assigné a ce chenil");
+                                Console.WriteLine();
+                                loop = false;
+                            }
+                            Console.WriteLine();
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Le type de l'animal n'est pas accépté par ce chenil");
+                    }
+                }
+            }
+        }
+        static void RemoveAnimalFromList()
+        {
+            if (AnimauxList.Count == 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Impossible d'accéder à ce menu, il n'y a aucun animal dans la liste.");
+                Console.WriteLine();
+                return;
+            }
+            Console.WriteLine("Appuyez sur échap pour annuler ou autre pour continuer.");
+            if (Console.ReadKey(true).Key == ConsoleKey.Escape)
+            {
+                return;
+            }
+            string libeltmp = null;
+            bool loop = true;
+            while (loop)
+            {
+                foreach (Chenil ch in ChenilList)
+                {
+                    Console.WriteLine(ch.Libelle + " " + ch.Enclos + " " + ch.Capacite + " " + ch.IdListani.Count + " " + ch.IdListSoigneur.Count);
+                }
+                Console.WriteLine("Quel chenil voulez-vous modifier ?");
+                libeltmp = Console.ReadLine();
+                foreach (Chenil ch in ChenilList)
+                {
+                    if (ch.Libelle.ToLower() == libeltmp.ToLower())
+                    {
+                        Console.WriteLine(ch.Libelle + " " + ch.Enclos + " " + ch.Capacite + " " + ch.IdListani.Count + " " + ch.IdListSoigneur.Count);
+                        loop = false;
+                    }
+                }
+            }
+            int tmpani = -1;
+            Animal animalmodif = null;
+            loop = true;
+            while (loop)
+            {
+                Chenil chenilselect = ChenilList.Where(ch => ch.Libelle.ToLower() == libeltmp.ToLower()).FirstOrDefault();
+                if (chenilselect != null)
+                {
+                    foreach (Chenil ch in ChenilList)
+                    {
+                        if (chenilselect.IdListani == ch.IdListani)
+                        {
+                            if (ch.IdListani.Count == 0)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("La liste selectionnée est vide");
+                                Console.WriteLine();
+                                return;
                             }
                         }
                     }
+                    Console.Write("Liste d'Id des animaux : ");
+                    foreach (int i in chenilselect.IdListani)
+                    {
+                        Console.WriteLine(i + ", ");
+                    }
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Chenil introuvable !");
+                    continue;
+                }
+
+                Console.WriteLine("Choisissez l'animal a retirer du chenil");
+                tmpani = GetIntFromConsole();
+                foreach (Animal animaux in AnimauxList)
+                {
+                    if (animaux.Id == tmpani)
+                    {
+                        animalmodif = animaux;
+                        chenilselect.IdListani.Remove(tmpani);
+                        Console.Clear();
+                        Console.WriteLine("Succès");
+                        Console.WriteLine();
+                        break;
+                    }
+                }
+                loop = true;
+                if (animalmodif == null)
+                {
+                    Console.WriteLine("L'id ne correspond à aucun animal dans la liste");
+                }
+                else
+                {
+                    loop = false;
                 }
             }
         }
